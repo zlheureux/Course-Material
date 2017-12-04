@@ -63,23 +63,39 @@ Theta2_grad = zeros(size(Theta2));
 %
 
 
+% Add ones to the X data matrix
+X = [ones(m, 1) X];
+a1 = X;
+z2 = a1*Theta1';
+a2 = sigmoid(z2);
+a2 = [ones(m, 1) a2];
+z3 = a2*Theta2';
+a3 = sigmoid(z3);
 
+yMatrix = eye(num_labels)(y,:);
+ 
+unreg = 1/m*trace(-yMatrix'*log(a3) - (1-yMatrix')*log(1-a3)); 
+reg = lambda/2/m*(sum(sum(Theta1(:, 2:columns(Theta1)).^2))+sum(sum(Theta2(:, 2:columns(Theta2)).^2)));
 
+J = unreg + reg;
 
+d3 = a3 - yMatrix;
+d2 = d3*Theta2(:, 2:columns(Theta2)).*sigmoidGradient(z2);
 
+delta2 = d3'*a2;
+delta1 = d2'*a1;
 
+Theta1_grad = 1/m*delta1;
+Theta2_grad = 1/m*delta2;
 
+Theta1(:,1) = 0;
+Theta2(:,1) = 0;
 
+Theta1_scaled = Theta1*lambda/m;
+Theta2_scaled = Theta2*lambda/m;
 
-
-
-
-
-
-
-
-
-
+Theta1_grad += Theta1_scaled;
+Theta2_grad += Theta2_scaled;
 % -------------------------------------------------------------
 
 % =========================================================================
